@@ -53,7 +53,11 @@ wasi_transport_connect (const char *address)
 	
 	while (!handshake_ok)
 	{
-        sock_accept (4, 4, &conn_fd);
+		printf ("Waiting for debugger to connect...\n");
+		const char* debugger_fd_env_var = getenv("DEBUGGER_FD");
+		int debugger_fd = atoi(debugger_fd_env_var);
+
+        sock_accept (debugger_fd, 4, &conn_fd);
         int res = write (conn_fd, (const char*)"", 0);
         if (conn_fd == -1 || res == -1)
         {
