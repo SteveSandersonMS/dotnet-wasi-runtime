@@ -39,8 +39,6 @@
 #include "wasm_m2n_invoke.g.h"
 #endif
 
-#include "generated-pinvokes.h"
-
 void mono_wasm_enable_debugging (int);
 
 int mono_wasm_register_root (char *start, size_t size, const char *name);
@@ -265,16 +263,6 @@ static PinvokeImport wasi_overrides [] = {
 	{"SystemCryptoNativeBrowser_CanUseSubtleCryptoImpl", SystemCryptoNativeBrowser_CanUseSubtleCryptoImpl},
 	{NULL, NULL}
 };
-
-void*
-wasm_dl_lookup_pinvoke_table (const char *name)
-{
-	for (int i = 0; i < pinvoke_tables_len; ++i) {
-		if (!strcmp (name, pinvoke_names [i]))
-			return pinvoke_tables [i];
-	}
-	return NULL;
-}
 
 static void *sysglobal_native_handle;
 
