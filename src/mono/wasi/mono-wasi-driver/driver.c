@@ -39,6 +39,8 @@
 #include "wasm_m2n_invoke.g.h"
 #endif
 
+#include "generated-pinvokes.h"
+
 void mono_wasm_enable_debugging (int);
 
 int mono_wasm_register_root (char *start, size_t size, const char *name);
@@ -180,40 +182,6 @@ mono_wasm_setenv (const char *name, const char *value)
 	monoeg_g_setenv (strdup (name), strdup (value), 1);
 }
 
-static void *sysglobal_native_handle;
-int32_t SystemNative_LChflagsCanSetHiddenFlag(void);
-char* SystemNative_GetEnv(char* name);
-char* SystemNative_GetEnviron(char* name);
-void SystemNative_FreeEnviron(char* name);
-intptr_t SystemNative_Dup(intptr_t oldfd);
-int32_t SystemNative_Write(intptr_t fd, const void* buffer, int32_t bufferSize);
-int64_t SystemNative_GetSystemTimeAsTicks();
-int32_t SystemNative_Stat(const char* path, void* output);
-int32_t SystemNative_LStat(const char* path, void* output);
-int32_t SystemNative_ConvertErrorPlatformToPal(int32_t platformErrno);
-void* SystemNative_LowLevelMonitor_Create();
-void SystemNative_LowLevelMonitor_Acquire(void* monitor);
-void SystemNative_LowLevelMonitor_Release(void* monitor);
-int32_t SystemNative_LowLevelMonitor_TimedWait(void *monitor, int32_t timeoutMilliseconds);
-void SystemNative_LowLevelMonitor_Wait(void* monitor);
-int SystemNative_GetErrNo();
-void SystemNative_SetErrNo(int value);
-char* SystemNative_GetCwd();
-void SystemNative_GetNonCryptographicallySecureRandomBytes();
-void SystemNative_GetCryptographicallySecureRandomBytes();
-int32_t SystemNative_Open(const char* path, int x, int y);
-void SystemNative_ConvertErrorPalToPlatform();
-void SystemNative_StrErrorR();
-void SystemNative_Close();
-void SystemNative_FStat();
-void SystemNative_LSeek();
-void SystemNative_PRead();
-void SystemNative_CanGetHiddenFlag();
-int32_t SystemNative_Access(const char* path, int32_t mode);
-void SystemNative_Malloc();
-void SystemNative_Free();
-void SystemNative_SysLog();
-
 #define PAL_O_RDONLY 0x0000
 #define PAL_O_WRONLY 0x0001
 #define PAL_O_RDWR 0x0002
@@ -264,9 +232,10 @@ int32_t SystemNative_Stat2(const char* path, FileStatus* output)
 	return ret;
 }
 
+int SystemNative_Write (int,int,int);
 int32_t SystemNative_Write2(intptr_t fd, const void* buffer, int32_t bufferSize) {
 	// Not sure why, but am getting fd=-1 when trying to write to stdout (which fails), so here's a workaround
-	return SystemNative_Write((int)fd == -1 ? 1: fd, buffer, bufferSize);
+	return SystemNative_Write((int)fd == -1 ? 1: fd, (int)buffer, bufferSize);
 }
 
 int64_t SystemNative_GetTimestamp2() {
@@ -278,73 +247,52 @@ int64_t SystemNative_GetTimestamp2() {
 		: 0;
 }
 
-static PinvokeImport SystemNativeImports [] = {
-	{"SystemNative_GetEnv", SystemNative_GetEnv },
-	{"SystemNative_GetEnviron", SystemNative_GetEnviron },
-	{"SystemNative_FreeEnviron", SystemNative_FreeEnviron },
-	{"SystemNative_LChflagsCanSetHiddenFlag", SystemNative_LChflagsCanSetHiddenFlag },
-	{"SystemNative_Dup", SystemNative_Dup},
-	{"SystemNative_Write", SystemNative_Write2},
-	{"SystemNative_GetSystemTimeAsTicks", SystemNative_GetSystemTimeAsTicks},
-	{"SystemNative_LStat", SystemNative_Stat2},
-	{"SystemNative_FStat", SystemNative_FStat},
-	{"SystemNative_LSeek", SystemNative_LSeek},
-	{"SystemNative_ConvertErrorPlatformToPal", SystemNative_ConvertErrorPlatformToPal},
-	{"SystemNative_LowLevelMonitor_Create", SystemNative_LowLevelMonitor_Create},
-	{"SystemNative_LowLevelMonitor_Acquire", SystemNative_LowLevelMonitor_Acquire},
-	{"SystemNative_LowLevelMonitor_Release", SystemNative_LowLevelMonitor_Release},
-	{"SystemNative_LowLevelMonitor_TimedWait", SystemNative_LowLevelMonitor_TimedWait},
-	{"SystemNative_LowLevelMonitor_Wait", SystemNative_LowLevelMonitor_Wait},
-	{"SystemNative_GetErrNo", SystemNative_GetErrNo},
-	{"SystemNative_SetErrNo", SystemNative_SetErrNo},
-	{"SystemNative_GetCwd", SystemNative_GetCwd},
-	{"SystemNative_GetNonCryptographicallySecureRandomBytes", SystemNative_GetNonCryptographicallySecureRandomBytes},
-	{"SystemNative_GetCryptographicallySecureRandomBytes", SystemNative_GetCryptographicallySecureRandomBytes},
-	{"SystemNative_Stat", SystemNative_Stat2},
-	{"SystemNative_Open", SystemNative_Open2},
-	{"SystemNative_Close", SystemNative_Close},
-	{"SystemNative_ConvertErrorPalToPlatform", SystemNative_ConvertErrorPalToPlatform},
-	{"SystemNative_StrErrorR", SystemNative_StrErrorR},
-	{"SystemNative_PRead", SystemNative_PRead},
-	{"SystemNative_CanGetHiddenFlag", SystemNative_CanGetHiddenFlag},
-	{"SystemNative_GetTimestamp", SystemNative_GetTimestamp2},
-	{"SystemNative_Access", SystemNative_Access},
-	{"SystemNative_Malloc", SystemNative_Malloc},
-	{"SystemNative_Free", SystemNative_Free},
-	{"SystemNative_SysLog", SystemNative_SysLog},
-	{NULL, NULL}
-};
-
-void GlobalizationNative_LoadICU() {
+int GlobalizationNative_LoadICU() {
 	assert(0);
+	return 0;
 }
-
-static PinvokeImport SystemGlobalizationNativeImports [] = {
-	{"GlobalizationNative_LoadICU", GlobalizationNative_LoadICU },
-	{NULL, NULL}
-};
 
 int SystemCryptoNativeBrowser_CanUseSubtleCryptoImpl() {
 	return 0;
 }
 
-static PinvokeImport SystemSecurityCryptographyNativeBrowserImports [] = {
-	{"SystemCryptoNativeBrowser_CanUseSubtleCryptoImpl", SystemCryptoNativeBrowser_CanUseSubtleCryptoImpl },
+static PinvokeImport wasi_overrides [] = {
+	{"SystemNative_Open", SystemNative_Open2},
+	{"SystemNative_Stat", SystemNative_Stat2},
+	{"SystemNative_LStat", SystemNative_Stat2},
+	{"SystemNative_Write", SystemNative_Write2},
+	{"SystemNative_GetTimestamp", SystemNative_GetTimestamp2},
+	{"SystemCryptoNativeBrowser_CanUseSubtleCryptoImpl", SystemCryptoNativeBrowser_CanUseSubtleCryptoImpl},
 	{NULL, NULL}
 };
+
+void*
+wasm_dl_lookup_pinvoke_table (const char *name)
+{
+	for (int i = 0; i < pinvoke_tables_len; ++i) {
+		if (!strcmp (name, pinvoke_names [i]))
+			return pinvoke_tables [i];
+	}
+	return NULL;
+}
+
+static void *sysglobal_native_handle;
 
 static void*
 wasm_dl_load (const char *name, int flags, char **err, void *user_data)
 {
-	if (!strcmp (name, "libSystem.Native"))
-		return SystemNativeImports;
-	if (!strcmp (name, "libSystem.Globalization.Native"))
-		return SystemGlobalizationNativeImports;
-	if (!strcmp (name, "libSystem.Security.Cryptography.Native.Browser"))
-		return SystemSecurityCryptographyNativeBrowserImports;
+	void* handle = wasm_dl_lookup_pinvoke_table (name);
+	if (handle)
+		return handle;
 
-	//printf("In wasm_dl_load for name %s but treating as NOT FOUND\n", name);
-    return 0;
+	if (!strcmp (name, "System.Globalization.Native"))
+		return sysglobal_native_handle;
+
+#if WASM_SUPPORTS_DLOPEN
+	return dlopen(name, flags);
+#endif
+
+	return NULL;
 }
 
 static void*
@@ -352,6 +300,14 @@ wasm_dl_symbol (void *handle, const char *name, char **err, void *user_data)
 {
 	if (handle == sysglobal_native_handle)
 		assert (0);
+
+	// We have to override certain symbols to behave correctly in a WASI environment
+	// Longer term it would be better to change the regular functions to work in a WASI environment
+	if (handle != wasi_overrides) {
+		void* override_func = wasm_dl_symbol(wasi_overrides, name, err, user_data);
+		if (override_func)
+			return override_func;
+	}
 
 	PinvokeImport *table = (PinvokeImport*)handle;
 	for (int i = 0; table [i].name; ++i) {

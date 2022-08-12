@@ -22,3 +22,12 @@ void mono_runtime_setup_stat_profiler () { assert(0); }
 int mono_thread_state_init_from_handle (int *tctx, int *info, void *sigctx) { assert(0); return 0; }
 
 void syslog(int pri, const char *fmt, int ignored) { assert (0); }
+
+int dlopen(const char *filename, int flags) { assert(0); return 0; }
+int readdir_r(int dirp, void* entry, void **restrict result) { assert(0); return 0; }
+int chmod(const char *path, int mode) { assert(0); return 0; }
+int fchmod(int fd, int mode) { assert(0); return 0; }
+int flock(int fd, int operation) { assert(0); return 0; }
+int mkstemps(char *template, int suffixlen) { assert(0); return 0; }
+int fstatfs(int fd, struct statfs *buf) { assert(0); return 0; }
+int getrusage(int who, struct rusage *usage) { assert(0); return 0; }
