@@ -155,6 +155,5 @@ static PinvokeImport libSystem_Native_imports [] = {
 {"SystemNative_Write", SystemNative_Write}, // System.Console, System.Private.CoreLib
 {NULL, NULL}
 };
-static int pinvoke_tables_len = 1;
 static void *pinvoke_tables[] = { libSystem_Native_imports,};
 static char *pinvoke_names[] = { "libSystem.Native",};

@@ -6,7 +6,7 @@
 void*
 wasm_dl_lookup_pinvoke_table (const char *name)
 {
-	for (int i = 0; i < pinvoke_tables_len; ++i) {
+	for (int i = 0; i < sizeof (pinvoke_tables) / sizeof (void*); ++i) {
 		if (!strcmp (name, pinvoke_names [i]))
 			return pinvoke_tables [i];
 	}
