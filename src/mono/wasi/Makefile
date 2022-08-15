@@ -5,7 +5,7 @@ all: build-all
 build-all: $(WASI_SDK_CLANG)
 	mkdir -p $(WASI_OBJ_DIR)
 	cd $(WASI_OBJ_DIR) && \
-	PATH=$(NINJA_DIR):${PATH} cmake -G Ninja \
+	PATH="$(NINJA_DIR):${PATH}" cmake -G Ninja \
 		-DWASI_SDK_PREFIX=$(WASI_SDK_ROOT) \
 		-DCMAKE_SYSROOT=$(WASI_SDK_ROOT)/share/wasi-sysroot \
 		-DCMAKE_TOOLCHAIN_FILE=$(WASI_SDK_ROOT)/share/cmake/wasi-sdk.cmake \
@@ -16,7 +16,7 @@ build-all: $(WASI_SDK_CLANG)
 		-DDISABLE_SHARED_LIBS=1 \
 		-Wl,--allow-undefined \
 		$(TOP)/src/mono
-	cd $(WASI_OBJ_DIR) && PATH=$(NINJA_DIR):${PATH} ninja
+	cd $(WASI_OBJ_DIR) && PATH="$(NINJA_DIR):${PATH}" ninja
 
 	mkdir -p $(WASI_BIN_DIR)
 	cp $(WASI_OBJ_DIR)/mono/mini/*.a $(WASI_OBJ_DIR)/libmono-wasi-driver.a $(WASI_BIN_DIR)
