@@ -29,5 +29,6 @@ int chmod(const char *path, int mode) { assert(0); return 0; }
 int fchmod(int fd, int mode) { assert(0); return 0; }
 int flock(int fd, int operation) { assert(0); return 0; }
 int mkstemps(char *template, int suffixlen) { assert(0); return 0; }
-int fstatfs(int fd, struct statfs *buf) { assert(0); return 0; }
-int getrusage(int who, struct rusage *usage) { assert(0); return 0; }
+int fstatfs(int fd, void *buf) { assert(0); return 0; }
+int getrusage(int who, void *usage) { assert(0); return 0; }
+char* mkdtemp(char *template) { assert(0); return (char*)0; }
