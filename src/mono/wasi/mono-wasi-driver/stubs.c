@@ -32,3 +32,6 @@ int mkstemps(char *template, int suffixlen) { assert(0); return 0; }
 int fstatfs(int fd, void *buf) { assert(0); return 0; }
 int getrusage(int who, void *usage) { assert(0); return 0; }
 char* mkdtemp(char *template) { assert(0); return (char*)0; }
+
+int madvise (void *a, int b, int c) { assert(0); return 0; }
+int msync (void *a, int b, int c) { assert(0); return 0; }

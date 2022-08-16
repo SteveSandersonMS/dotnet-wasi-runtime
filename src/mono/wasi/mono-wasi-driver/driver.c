@@ -275,6 +275,8 @@ wasm_dl_load (const char *name, int flags, char **err, void *user_data)
 
 	if (!strcmp (name, "System.Globalization.Native"))
 		return sysglobal_native_handle;
+	if (!strcmp (name, "libSystem.Security.Cryptography.Native.Browser"))
+		return wasi_overrides;
 
 #if WASM_SUPPORTS_DLOPEN
 	return dlopen(name, flags);
