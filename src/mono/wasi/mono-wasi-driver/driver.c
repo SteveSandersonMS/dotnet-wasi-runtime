@@ -184,20 +184,42 @@ mono_wasm_setenv (const char *name, const char *value)
 #define PAL_O_WRONLY 0x0001
 #define PAL_O_RDWR 0x0002
 #define PAL_O_ACCESS_MODE_MASK 0x000F
+#define PAL_O_CREAT 0x0020
+#define PAL_O_EXCL 0x0040
+#define PAL_O_TRUNC 0x0080
+#define PAL_O_SYNC 0x0100
 
 int32_t SystemNative_Open2(const char* path, int flags, int mode) {
-	//printf ("In SystemNative_Open2 for %s\n", path);
+	// printf ("In SystemNative_Open2 for %s with flags %i and mode %i\n", path, flags, mode);
 	// The implementation in libSystemNative tries to use PAL_O_CLOEXEC, which isn't supported here, so override it
+
+	int32_t ret;
 	if ((flags & PAL_O_ACCESS_MODE_MASK) == PAL_O_RDONLY) {
-		flags = O_RDONLY;
+		ret = O_RDONLY;
 	} else if ((flags & PAL_O_ACCESS_MODE_MASK) == PAL_O_RDWR) {
-		flags = O_RDWR;
+		ret = O_RDWR;
 	} else if ((flags & PAL_O_ACCESS_MODE_MASK) == PAL_O_WRONLY) {
-		flags = O_WRONLY;
+		ret = O_WRONLY;
+	} else {
+		printf("Unknown Open access mode %i\n", (int)flags);
+        return -1;
+	}
+
+    if (flags & PAL_O_CREAT) {
+        ret |= O_CREAT;
+	}
+    if (flags & PAL_O_EXCL) {
+        ret |= O_EXCL;
+	}
+    if (flags & PAL_O_TRUNC) {
+        ret |= O_TRUNC;
+	}
+    if (flags & PAL_O_SYNC) {
+        ret |= O_SYNC;
 	}
 
 	int result;
-    while ((result = open(path, flags, (mode_t)mode)) < 0 && errno == EINTR);
+    while ((result = open(path, ret, (mode_t)mode)) < 0 && errno == EINTR);
 	return result;
 }
 
