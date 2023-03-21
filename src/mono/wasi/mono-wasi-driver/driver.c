@@ -11,6 +11,7 @@
 #include <sys/time.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <dirent.h>
 
 #define INVARIANT_GLOBALIZATION 1
 
@@ -285,6 +286,51 @@ static PinvokeImport wasi_overrides [] = {
 	{"SystemCryptoNativeBrowser_CanUseSubtleCryptoImpl", SystemCryptoNativeBrowser_CanUseSubtleCryptoImpl},
 	{NULL, NULL}
 };
+
+// Because libSystem.Native.a is still compiled using Emscripten, we have to use a compatible definition of dirent
+// when implementing readdir_r. This issue would go away if libSystem.Native.a was built with WASI SDK.
+struct emscripten_dirent {
+	ino_t d_ino;
+	off_t d_off;
+	unsigned short d_reclen;
+	unsigned char d_type;
+	char d_name[1];
+};
+
+int readdir_r(DIR *restrict dir, struct emscripten_dirent *restrict buf, struct emscripten_dirent **restrict result) {
+	struct dirent *de;
+	int errno_save = errno;
+	int ret;
+
+	errno = 0;
+
+	// Skip the '.' and '..' entries because these special entries (or .. at least)
+	// can result in an assertion failure when we later try to stat them
+	while (1) {
+		de = readdir(dir);
+		if (errno || !de || (strcmp(de->d_name, ".") && strcmp(de->d_name, ".."))) {
+			break;
+		}
+	}
+
+	if ((ret = errno)) {
+		return ret;
+	}
+	errno = errno_save;
+
+	if (de) {
+		buf->d_ino = de->d_ino;
+		buf->d_off = 0;
+		buf->d_reclen = 0;
+		buf->d_type = 0;
+		memcpy(&buf->d_name, &de->d_name, strlen(de->d_name) + 1);
+	} else {
+		buf = NULL;
+	}
+
+	*result = buf;
+	return 0;
+}
 
 static void *sysglobal_native_handle;
 

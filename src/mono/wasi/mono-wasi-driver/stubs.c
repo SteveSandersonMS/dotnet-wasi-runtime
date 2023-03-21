@@ -24,7 +24,6 @@ int mono_thread_state_init_from_handle (int *tctx, int *info, void *sigctx) { as
 void syslog(int pri, const char *fmt, int ignored) { assert (0); }
 
 int dlopen(const char *filename, int flags) { assert(0); return 0; }
-int readdir_r(int dirp, void* entry, void **restrict result) { assert(0); return 0; }
 int chmod(const char *path, int mode) { assert(0); return 0; }
 int fchmod(int fd, int mode) { assert(0); return 0; }
 int flock(int fd, int operation) { assert(0); return 0; }

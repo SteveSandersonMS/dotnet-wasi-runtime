@@ -83,7 +83,9 @@ inline static int ToFileDescriptorUnchecked(intptr_t fd)
 */
 inline static int ToFileDescriptor(intptr_t fd)
 {
+#if !defined(HOST_WASM)
     assert(0 <= fd && fd < sysconf(_SC_OPEN_MAX));
+#endif
 
     return ToFileDescriptorUnchecked(fd);
 }
